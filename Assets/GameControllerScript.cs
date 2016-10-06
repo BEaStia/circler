@@ -21,7 +21,7 @@ public class GameControllerScript : MonoBehaviour
         Element,
         Plus
     }
-
+    
     public int Count = 2;
     public float Angle, Radius = 450f;
     public List<Element> Elements = new List<Element>();
@@ -56,6 +56,7 @@ public class GameControllerScript : MonoBehaviour
                 var gO = Instantiate(prefab) as GameObject;
                 if (gO == null) continue;
                 gO.GetComponent<ElementScript>().Element = Elements[i];
+                gO.GetComponent<ElementScript>().NewElement = false;
                 gO.transform.SetParent(parent.transform);
                 gO.transform.localPosition = new Vector3(Radius*Mathf.Cos(Angle*i) + scale.x,
                     Radius*Mathf.Sin(Angle*i) + scale.y, 0);
@@ -89,9 +90,23 @@ public class GameControllerScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
 
+    }
+
+    public Element AddNewElement()
+    {
+        var prefab = Resources.Load("circlePrefab");
+        var parent = GameObject.Find("Canvas").transform.Find("Field").gameObject;
+        var gO = Instantiate(prefab) as GameObject;
+        if (gO == null) return null;
+        gO.transform.SetParent(parent.transform);
+        gO.name = "New";
+        gO.GetComponent<ElementScript>().Element = new Element { ElementType = ElementTypes.Element, Name = "He", Object = gO };
+        gO.transform.localPosition = new Vector3();
+        var element = gO.GetComponent<ElementScript>().Element;
+        return element;
     }
 
     public void OnClick(BaseEventData eventData)
@@ -106,15 +121,13 @@ public class GameControllerScript : MonoBehaviour
         for (var i = 0; i < Elements.Count; i++)
         {
             if (!(i*Angle < angle) || !((i + 1)*Angle > angle)) continue;
-            var prefab = Resources.Load("circlePrefab");
+            var gO = GameObject.Find("Canvas").transform.Find("Field").Find("New");
             var parent = GameObject.Find("Canvas").transform.Find("Field").gameObject;
-            var gO = Instantiate(prefab) as GameObject;
-            if (gO == null) continue;
             gO.transform.SetParent(parent.transform);
-            gO.GetComponent<ElementScript>().Element = new Element {ElementType = ElementTypes.Element, Name = "He"};
-            gO.transform.localPosition = position;
+            gO.name = "Not new";
+
             Elements.Insert(Elements[i].Object.GetComponent<ElementScript>().Id + 1,
-                new Element {ElementType = ElementTypes.Element, Name = "He", Object = gO});
+                gO.GetComponent<ElementScript>().Element);
         }
         PlaceElements();
     }

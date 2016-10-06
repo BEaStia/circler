@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using Assets;
 using DigitalRuby.Tween;
 using UnityEngine.UI;
 
